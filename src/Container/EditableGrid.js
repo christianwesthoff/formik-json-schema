@@ -76,7 +76,7 @@ const EditableGrid = ({
 }) => {
     const { values, errors, touched } = formik;
     const arrayFields = _.mapValues(_.assign({}, elements), () => '');
-    const arrayValues = _.get(values, fieldArrayName);
+    const arrayValues = _.get(values, fieldArrayName) || [ arrayFields ];
     const hasValue = _.size(arrayValues) > 0;
     const tableWidth = _.map(elements, 'width').reduce(( sum, num ) => sum + num, 50) || '100%';
     const additionalColumnCount = isSortable ? 2 : 1;
