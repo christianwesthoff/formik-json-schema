@@ -18,7 +18,8 @@ const Fieldset = ({
         cardHeaderIconCollapsedClass = 'fas fa-angle-down',
         cardHeaderIconDisclosedClass = 'fas fa-angle-up',
         cardHeaderActionsClass = 'card-header-actions',
-        cardBodyClass = 'card-body'
+        cardBodyClass = 'card-body',
+        carderHeaderActionButtonClass = 'card-header-action btn btn-minimize'
     }
 }) => {
     const [ isCollapsed, setIsCollapsed ] = useState(collapsible && collapsed);
@@ -37,7 +38,7 @@ const Fieldset = ({
                     { hasHeaderIcon && <i className={ headerIconClass }></i> }
                     { title }
                     { collapsible && <div className={ cardHeaderActionsClass }>
-                        <a className="card-header-action btn btn-minimize">
+                        <a className={ carderHeaderActionButtonClass }>
                             <i className={ isCollapsed ?  cardHeaderIconCollapsedClass : cardHeaderIconDisclosedClass }></i>
                         </a>
                     </div> }
@@ -67,7 +68,8 @@ Fieldset.propTypes = {
         cardClass: PropTypes.string,
         cardHeaderClass: PropTypes.string,
         cardHeaderActionsClass: PropTypes.string,
-        cardBodyClass: PropTypes.string
+        cardBodyClass: PropTypes.string,
+        carderHeaderActionButtonClass: PropTypes.string
     })
 }
 
