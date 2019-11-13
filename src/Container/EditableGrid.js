@@ -11,12 +11,12 @@ const SortableItem = SortableElement((props) => renderTableRow(props));
 const SortableTableBody = SortableContainer((props) => renderTableBody(props));
 const SortableRowHandle = SortableHandle((props) => renderSortableHandle(props));
 
-const renderTableBody = ({ isObject = false, isSortable, hasValue, arrayValues, ...rowProps }) => (
+const renderTableBody = ({ isObject = false, isSortable, initTable, hasValue, arrayValues, ...rowProps }) => (
     <tbody>
         { hasValue ? _.map(arrayValues, ( value, index ) =>
             isObject === false && isSortable
-                ? <SortableItem key={ index } index={ index } rowIndex={ index } value={ value } isSortable={ isSortable } { ...rowProps } />
-                : renderTableRow({ ...rowProps, index, rowIndex: index, value, isObject })
+                ? <SortableItem key={ index+1 } index={ index } rowIndex={ index } value={ value } isSortable={ isSortable } { ...rowProps } />
+                : renderTableRow({ ...rowProps, index: index, rowIndex: index, value, isObject })
         ) : null }
     </tbody>
 );
@@ -68,6 +68,7 @@ const EditableGrid = ({
         isObject = false,
         elements,
         buttons,
+        initTable = true,
         isSortable = true,
         tableHeaderClass = '',
         tableContainerClass = 'table-responsive',
@@ -79,10 +80,16 @@ const EditableGrid = ({
     },
     formik
 }) => {
-    const { values, errors, touched } = formik;
+    const { values, errors, touched, setFieldValue } = formik;
     const arrayFields = _.mapValues(_.assign({}, elements), () => '');
-    const arrayValues = _.get(values, fieldArrayName) || [ arrayFields ];
+    const arrayValues = _.get(values, fieldArrayName);
     const hasValue = _.size(arrayValues) > 0;
+
+    if (initTable && !hasValue) {
+        setFieldValue(fieldArrayName, [ arrayFields ]);
+        return (null);
+    }
+
     const tableWidth = _.map(elements, 'width').reduce(( sum, num ) => sum + num, 50) || '100%';
     const additionalColumnCount = isSortable ? 2 : 1;
 
@@ -93,7 +100,6 @@ const EditableGrid = ({
                 const bodyProps = {
                     arrayValues, hasValue, elements, fieldArrayName, arrayActions, buttons, isSortable, isObject, buttonDuplicateClass, buttonCopyClass, iconSortableHandle
                 };
-
                 return (
                     <div className={ tableContainerClass }>
                         <table className={ tableClass } style={{ width: tableWidth }}>
