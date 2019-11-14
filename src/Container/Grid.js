@@ -3,10 +3,11 @@ import Element from '../Element';
 import { getName } from '../utils';
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { joinNames } from '../utils';
 
 const Grid = ({
     config: {
-        name: containerName = '',
+        name: fieldArrayName,
         elements,
         showTableHeader = true,
         tableHeaderClass = '',
@@ -16,28 +17,33 @@ const Grid = ({
     }
 }) => {
     if (Array.isArray(elements)) {
+        const { values, errors, touched, setFieldValue, initialValues } = formik;
+        const arrayValues = _.get(values, fieldArrayName);
+        
+        const tableWidth = _.map(elements, 'width').reduce(( sum, num ) => sum + num, 50) || '100%';
         return (
             <div className={ tableContainerClass }>
                 <table className={ tableClass } style={{ width: tableWidth }}>
                     { showTableHeader && <thead className={ tableHeaderClass } >
                         <tr>
-                            { isObject === false && isSortable && <th/>}
                             { _.map(elements, ({ label, width }, key) =>
                                 <th key={ key } style={{ width: width }}>{ label }</th>
                             ) }
-                            { isObject === false && !!buttons && !!buttons.remove && <th></th> }
                         </tr>
                     </thead> }
                     <tbody className={ tableBodyClass }>
-                        <tr>
-                        { _.map(elements, ({ name, ...config }, key) => (
-                            <td><Element
-                                key={ key }
-                                config={{ ...config, name: getName(config.type, name, containerName) }}
-                            /></td>
-                        ))}
+                    { _.map(arrayValues, ( value, index ) => (
+                        <tr key={ index }>
+                            { _.map(elements, ({ name, label, ...rest }, key) => (
+                                <td key={ key }>
+                                    <Element config={{ ...rest, name: joinNames(fieldArrayName, rowIndex, name) }} />
+                                </td>
+                            ))}
                         </tr>
-                    </tbody>
+                        ))}
+                    <tr>
+                    </tr>
+                </tbody>
                 </table>
             </div>
         );
@@ -47,11 +53,9 @@ const Grid = ({
             <table className={ tableClass } style={{ width: tableWidth }}>
                 { showTableHeader && <thead className={ tableHeaderClass } >
                     <tr>
-                        { isObject === false && isSortable && <th/>}
                         { _.map(elements, ({ label, width }, key) =>
                             <th key={ key } style={{ width: width }}>{ label }</th>
                         ) }
-                        { isObject === false && !!buttons && !!buttons.remove && <th></th> }
                     </tr>
                 </thead> }
                 <tbody className={ tableBodyClass }>
