@@ -13,11 +13,11 @@ const SortableRowHandle = SortableHandle((props) => renderSortableHandle(props))
 
 const renderTableBody = ({ isObject = false, isSortable, initTable, hasValue, arrayValues, ...rowProps }) => (
     <tbody>
-        { hasValue ? _.map(arrayValues, ( value, index ) =>
-            isObject === false && isSortable
-                ? <SortableItem key={ index+1 } index={ index } rowIndex={ index } value={ value } isSortable={ isSortable } { ...rowProps } />
-                : renderTableRow({ ...rowProps, index: index, rowIndex: index, value, isObject })
-        ) : null }
+    { hasValue ? _.map(arrayValues, ( value, index ) =>
+        isObject === false && isSortable
+            ? <SortableItem key={ index+1 } index={ index } rowIndex={ index } value={ value } isSortable={ isSortable } { ...rowProps } />
+            : renderTableRow({ ...rowProps, index: index, rowIndex: index, value, isObject })
+    ) : null }
     </tbody>
 );
 
@@ -41,7 +41,7 @@ const renderTableRow = ({ fieldArrayName, elements, arrayActions, buttonDuplicat
                                 onClick={ arrayActions.remove.bind(this, rowIndex) }>{ buttons.remove }
                             </button>
                         )
-                    )
+                )
                 }
                 { !!buttons.duplicate && (
                     _.isFunction(buttons.duplicate)
@@ -53,43 +53,38 @@ const renderTableRow = ({ fieldArrayName, elements, arrayActions, buttonDuplicat
                                 onClick={ arrayActions.push.bind(this, value) }>{ buttons.duplicate }
                             </button>
                         )
-                    )
+                )
                 }
             </td>
         )}
     </tr>
 );
 
-const renderSortableHandle = ( { iconSortableHandle } ) => <td><i className={ iconSortableHandle }></i></td>
+const renderSortableHandle = ( { iconSortableHandle } ) => <td><i className={ iconSortableHandle } /></td>;
 
 const EditableGrid = ({
-    config: {
-        name: fieldArrayName,
-        isObject = false,
-        elements,
-        buttons,
-        initTable = true,
-        isSortable = true,
-        tableHeaderClass = '',
-        tableContainerClass = 'table-responsive',
-        tableClass = 'table table-bordered flutter-editable-grid',
-        buttonAddClass = 'btn btn-secondary',
-        buttonDuplicateClass = 'btn duplicate',
-        buttonCopyClass = 'btn duplicate',
-        iconSortableHandle = 'fas fa-grip-vertical'
-    },
-    formik
-}) => {
-    const { values, errors, touched, setFieldValue } = formik;
+                          config: {
+                              name: fieldArrayName,
+                              isObject = false,
+                              elements,
+                              buttons,
+                              isSortable = true,
+                              tableHeaderClass = '',
+                              tableContainerClass = 'table-responsive',
+                              tableClass = 'table table-bordered flutter-editable-grid',
+                              buttonAddClass = 'btn btn-secondary',
+                              buttonDuplicateClass = 'btn duplicate',
+                              buttonCopyClass = 'btn duplicate',
+                              iconSortableHandle = 'fas fa-grip-vertical'
+                          },
+                          formik
+                      }) => {
+    const { values, errors, touched, setFieldValue, initialValues } = formik;
     const arrayFields = _.mapValues(_.assign({}, elements), () => '');
     const arrayValues = _.get(values, fieldArrayName);
     const hasValue = _.size(arrayValues) > 0;
-
-    if (initTable && !hasValue) {
-        setFieldValue(fieldArrayName, [ arrayFields ]);
-        return (null);
-    }
-
+    const initialArrayValues = _.head(_.get(values, fieldArrayName.replace(/\d+/, '0')));
+    
     const tableWidth = _.map(elements, 'width').reduce(( sum, num ) => sum + num, 50) || '100%';
     const additionalColumnCount = isSortable ? 2 : 1;
 
@@ -97,6 +92,11 @@ const EditableGrid = ({
         <FieldArray
             name={ fieldArrayName }
             render={( arrayActions ) => {
+                if (!hasValue && initialArrayValues) {
+                    // setInit(true);
+                    arrayActions.push(initialArrayValues);
+                    return null;
+                }
                 const bodyProps = {
                     arrayValues, hasValue, elements, fieldArrayName, arrayActions, buttons, isSortable, isObject, buttonDuplicateClass, buttonCopyClass, iconSortableHandle
                 };
@@ -104,13 +104,13 @@ const EditableGrid = ({
                     <div className={ tableContainerClass }>
                         <table className={ tableClass } style={{ width: tableWidth }}>
                             <thead className={ tableHeaderClass } >
-                                <tr>
-                                    { isObject === false && isSortable && <th></th>}
-                                    { _.map(elements, ({ label, width }, key) =>
-                                        <th key={ key } style={{ width: width }}>{ label }</th>
-                                    ) }
-                                    { isObject === false && !!buttons && !!buttons.remove && <th></th> }
-                                </tr>
+                            <tr>
+                                { isObject === false && isSortable && <th/>}
+                                { _.map(elements, ({ label, width }, key) =>
+                                    <th key={ key } style={{ width: width }}>{ label }</th>
+                                ) }
+                                { isObject === false && !!buttons && !!buttons.remove && <th></th> }
+                            </tr>
                             </thead>
                             { isObject === false && isSortable
                                 ? <SortableTableBody
@@ -122,29 +122,29 @@ const EditableGrid = ({
                                 : renderTableBody(bodyProps)
                             }
                             <tfoot>
-                                <tr>
-                                    { isObject === false && !!buttons && !!buttons.add &&
-                                        <td colSpan={ _.size(elements) + additionalColumnCount }>
-                                            { _.isFunction(buttons.add)
-                                                ? buttons.add(arrayActions, arrayFields, rowIndex)
-                                                : (
-                                                    <button
-                                                        type="button"
-                                                        className={ buttonAddClass }
-                                                        onClick={ arrayActions.push.bind(this, arrayFields) }>{ buttons.add }
-                                                    </button>
-                                                )
-                                            }
-                                        </td>
+                            <tr>
+                                { isObject === false && !!buttons && !!buttons.add &&
+                                <td colSpan={ _.size(elements) + additionalColumnCount }>
+                                    { _.isFunction(buttons.add)
+                                        ? buttons.add(arrayActions, arrayFields, rowIndex)
+                                        : (
+                                            <button
+                                                type="button"
+                                                className={ buttonAddClass }
+                                                onClick={ arrayActions.push.bind(this, arrayFields) }>{ buttons.add }
+                                            </button>
+                                        )
                                     }
-                                </tr>
+                                </td>
+                                }
+                            </tr>
                             </tfoot>
                         </table>
                     </div>
                 )
-        }} />
+            }} />
     );
-}
+};
 
 EditableGrid.propTypes = {
     config: PropTypes.shape({
@@ -173,6 +173,6 @@ EditableGrid.propTypes = {
         buttonCopyClass: PropTypes.string,
         iconSortableHandle: PropTypes.string
     })
-}
+};
 
 export default EditableGrid;

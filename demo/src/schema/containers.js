@@ -11,10 +11,6 @@ export default {
                 first: {
                     name: 'John Doe',
                     age: 33
-                },
-                second: {
-                    name: 'Jane Doe',
-                    age: 47
                 }
             }
         }
