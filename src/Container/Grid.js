@@ -4,7 +4,7 @@ import { getName } from '../utils';
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-const Table = ({
+const Grid = ({
     config: {
         name: containerName = '',
         elements,
@@ -15,6 +15,33 @@ const Table = ({
         tableClass = 'table table-bordered flutter-editable-grid',
     }
 }) => {
+    if (Array.isArray(elements)) {
+        return (
+            <div className={ tableContainerClass }>
+                <table className={ tableClass } style={{ width: tableWidth }}>
+                    { showTableHeader && <thead className={ tableHeaderClass } >
+                        <tr>
+                            { isObject === false && isSortable && <th/>}
+                            { _.map(elements, ({ label, width }, key) =>
+                                <th key={ key } style={{ width: width }}>{ label }</th>
+                            ) }
+                            { isObject === false && !!buttons && !!buttons.remove && <th></th> }
+                        </tr>
+                    </thead> }
+                    <tbody className={ tableBodyClass }>
+                        <tr>
+                        { _.map(elements, ({ name, ...config }, key) => (
+                            <td><Element
+                                key={ key }
+                                config={{ ...config, name: getName(config.type, name, containerName) }}
+                            /></td>
+                        ))}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
+    }
     return (
         <div className={ tableContainerClass }>
             <table className={ tableClass } style={{ width: tableWidth }}>
@@ -42,7 +69,7 @@ const Table = ({
     );
 }
 
-Table.propTypes = {
+Grid.propTypes = {
     config: PropTypes.shape({
         name: PropTypes.string,
         title: PropTypes.string,
@@ -55,4 +82,4 @@ Table.propTypes = {
     })
 }
 
-export default Table;
+export default Grid;

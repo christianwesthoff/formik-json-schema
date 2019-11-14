@@ -29,7 +29,7 @@ const renderTableRow = ({ fieldArrayName, elements, arrayActions, buttonDuplicat
                 <Element config={{ ...rest, name: joinNames(fieldArrayName, rowIndex, name) }} />
             </td>
         ))}
-        { isObject === false && !!buttons && (
+        { isObject === false && !!buttons && (!buttons.add || Object.keys(buttons).length > 1) && (
             <td style={{ minWidth: 50 }}>
                 { !!buttons.remove && (
                     _.isFunction(buttons.remove)
@@ -67,7 +67,7 @@ const EditableGrid = ({
                               name: fieldArrayName,
                               isObject = false,
                               elements,
-                              buttons,
+                              buttons = null,
                               isSortable = true,
                               showTableHeader = true,
                               showTableFooter = true,
@@ -89,8 +89,7 @@ const EditableGrid = ({
     const initialArrayValues = _.head(_.get(values, fieldArrayName.replace(/\d+/, '0')));
     
     const tableWidth = _.map(elements, 'width').reduce(( sum, num ) => sum + num, 50) || '100%';
-    const additionalColumnCount = isSortable ? 2 : 1;
-
+    const additionalColumnCount = isSortable ? 2 : !!buttons && (!buttons.add || Object.keys(buttons).length > 1) ? 1 : 0;
     return (
         <FieldArray
             name={ fieldArrayName }
