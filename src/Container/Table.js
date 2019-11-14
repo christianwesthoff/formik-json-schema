@@ -8,6 +8,7 @@ const Table = ({
     config: {
         name: containerName = '',
         elements,
+        showTableHeader = true,
         tableHeaderClass = '',
         tableContainerClass = 'table-responsive',
         tableBodyClass = '',
@@ -17,7 +18,7 @@ const Table = ({
     return (
         <div className={ tableContainerClass }>
             <table className={ tableClass } style={{ width: tableWidth }}>
-                <thead className={ tableHeaderClass } >
+                { showTableHeader && <thead className={ tableHeaderClass } >
                     <tr>
                         { isObject === false && isSortable && <th/>}
                         { _.map(elements, ({ label, width }, key) =>
@@ -25,7 +26,7 @@ const Table = ({
                         ) }
                         { isObject === false && !!buttons && !!buttons.remove && <th></th> }
                     </tr>
-                </thead>
+                </thead> }
                 <tbody className={ tableBodyClass }>
                     <tr>
                     { _.map(elements, ({ name, ...config }, key) => (
@@ -41,11 +42,12 @@ const Table = ({
     );
 }
 
-Fieldset.propTypes = {
+Table.propTypes = {
     config: PropTypes.shape({
         name: PropTypes.string,
         title: PropTypes.string,
         elements: PropTypes.object.isRequired,
+        showTableHeader: PropTypes.bool,
         tableContainerClass: PropTypes.string,
         tableClass: PropTypes.string,
         tableBodyClass: PropTypes.string,

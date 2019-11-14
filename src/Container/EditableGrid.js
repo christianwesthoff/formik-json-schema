@@ -69,13 +69,15 @@ const EditableGrid = ({
                               elements,
                               buttons,
                               isSortable = true,
+                              showTableHeader = true,
+                              showTableFooter = true,
                               tableHeaderClass = '',
                               tableBodyClass = '',
                               tableContainerClass = 'table-responsive',
                               tableClass = 'table table-bordered flutter-editable-grid',
                               buttonAddClass = 'btn btn-secondary',
                               buttonDuplicateClass = 'btn duplicate',
-                              buttonCopyClass = 'btn duplicate',
+                              buttonRemoveClass = 'btn remove',
                               iconSortableHandle = 'fas fa-grip-vertical'
                           },
                           formik
@@ -100,12 +102,12 @@ const EditableGrid = ({
                 }
                 const bodyProps = {
                     arrayValues, hasValue, elements, fieldArrayName, arrayActions, buttons, isSortable, isObject, tableBodyClass, 
-                    buttonDuplicateClass, buttonCopyClass, iconSortableHandle
+                    buttonDuplicateClass, buttonRemoveClass, iconSortableHandle
                 };
                 return (
                     <div className={ tableContainerClass }>
                         <table className={ tableClass } style={{ width: tableWidth }}>
-                            <thead className={ tableHeaderClass } >
+                            { showTableHeader && <thead className={ tableHeaderClass } >
                                 <tr>
                                     { isObject === false && isSortable && <th/>}
                                     { _.map(elements, ({ label, width }, key) =>
@@ -113,7 +115,7 @@ const EditableGrid = ({
                                     ) }
                                     { isObject === false && !!buttons && !!buttons.remove && <th></th> }
                                 </tr>
-                            </thead>
+                            </thead> }
                             { isObject === false && isSortable
                                 ? <SortableTableBody
                                     distance={ 10 }
@@ -123,7 +125,7 @@ const EditableGrid = ({
                                 />
                                 : renderTableBody(bodyProps)
                             }
-                            <tfoot>
+                            { showTableFooter && <tfoot>
                                 <tr>
                                     { isObject === false && !!buttons && !!buttons.add &&
                                     <td colSpan={ _.size(elements) + additionalColumnCount }>
@@ -140,7 +142,7 @@ const EditableGrid = ({
                                     </td>
                                     }
                                 </tr>
-                            </tfoot>
+                            </tfoot> }
                         </table>
                     </div>
                 )
@@ -167,13 +169,15 @@ EditableGrid.propTypes = {
             ]),
         }),
         isSortable: PropTypes.bool,
+        showTableHeader: PropTypes.bool,
+        showTableFooter: PropTypes.bool,
         tableContainerClass: PropTypes.string,
         tableClass: PropTypes.string,
         tableBodyClass: PropTypes.string,
         tableHeaderClass: PropTypes.string,
         buttonAddClass: PropTypes.string,
         buttonDuplicateClass: PropTypes.string,
-        buttonCopyClass: PropTypes.string,
+        buttonRemoveClass: PropTypes.string,
         iconSortableHandle: PropTypes.string
     })
 };
