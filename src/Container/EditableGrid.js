@@ -11,11 +11,11 @@ const SortableItem = SortableElement((props) => renderTableRow(props));
 const SortableTableBody = SortableContainer((props) => renderTableBody(props));
 const SortableRowHandle = SortableHandle((props) => renderSortableHandle(props));
 
-const renderTableBody = ({ isObject = false, isSortable, initTable, hasValue, arrayValues, ...rowProps }) => (
-    <tbody>
+const renderTableBody = ({ isObject = false, isSortable, initTable, hasValue, arrayValues, tableBodyClass, ...rowProps }) => (
+    <tbody className={ tableBodyClass }>
     { hasValue ? _.map(arrayValues, ( value, index ) =>
         isObject === false && isSortable
-            ? <SortableItem key={ index+1 } index={ index } rowIndex={ index } value={ value } isSortable={ isSortable } { ...rowProps } />
+            ? <SortableItem key={ index } index={ index } rowIndex={ index } value={ value } isSortable={ isSortable } { ...rowProps } />
             : renderTableRow({ ...rowProps, index: index, rowIndex: index, value, isObject })
     ) : null }
     </tbody>
@@ -70,6 +70,7 @@ const EditableGrid = ({
                               buttons,
                               isSortable = true,
                               tableHeaderClass = '',
+                              tableBodyClass = '',
                               tableContainerClass = 'table-responsive',
                               tableClass = 'table table-bordered flutter-editable-grid',
                               buttonAddClass = 'btn btn-secondary',
@@ -98,19 +99,20 @@ const EditableGrid = ({
                     return null;
                 }
                 const bodyProps = {
-                    arrayValues, hasValue, elements, fieldArrayName, arrayActions, buttons, isSortable, isObject, buttonDuplicateClass, buttonCopyClass, iconSortableHandle
+                    arrayValues, hasValue, elements, fieldArrayName, arrayActions, buttons, isSortable, isObject, tableBodyClass, 
+                    buttonDuplicateClass, buttonCopyClass, iconSortableHandle
                 };
                 return (
                     <div className={ tableContainerClass }>
                         <table className={ tableClass } style={{ width: tableWidth }}>
                             <thead className={ tableHeaderClass } >
-                            <tr>
-                                { isObject === false && isSortable && <th/>}
-                                { _.map(elements, ({ label, width }, key) =>
-                                    <th key={ key } style={{ width: width }}>{ label }</th>
-                                ) }
-                                { isObject === false && !!buttons && !!buttons.remove && <th></th> }
-                            </tr>
+                                <tr>
+                                    { isObject === false && isSortable && <th/>}
+                                    { _.map(elements, ({ label, width }, key) =>
+                                        <th key={ key } style={{ width: width }}>{ label }</th>
+                                    ) }
+                                    { isObject === false && !!buttons && !!buttons.remove && <th></th> }
+                                </tr>
                             </thead>
                             { isObject === false && isSortable
                                 ? <SortableTableBody
@@ -122,22 +124,22 @@ const EditableGrid = ({
                                 : renderTableBody(bodyProps)
                             }
                             <tfoot>
-                            <tr>
-                                { isObject === false && !!buttons && !!buttons.add &&
-                                <td colSpan={ _.size(elements) + additionalColumnCount }>
-                                    { _.isFunction(buttons.add)
-                                        ? buttons.add(arrayActions, arrayFields, rowIndex)
-                                        : (
-                                            <button
-                                                type="button"
-                                                className={ buttonAddClass }
-                                                onClick={ arrayActions.push.bind(this, arrayFields) }>{ buttons.add }
-                                            </button>
-                                        )
+                                <tr>
+                                    { isObject === false && !!buttons && !!buttons.add &&
+                                    <td colSpan={ _.size(elements) + additionalColumnCount }>
+                                        { _.isFunction(buttons.add)
+                                            ? buttons.add(arrayActions, arrayFields, rowIndex)
+                                            : (
+                                                <button
+                                                    type="button"
+                                                    className={ buttonAddClass }
+                                                    onClick={ arrayActions.push.bind(this, arrayFields) }>{ buttons.add }
+                                                </button>
+                                            )
+                                        }
+                                    </td>
                                     }
-                                </td>
-                                }
-                            </tr>
+                                </tr>
                             </tfoot>
                         </table>
                     </div>
@@ -167,6 +169,7 @@ EditableGrid.propTypes = {
         isSortable: PropTypes.bool,
         tableContainerClass: PropTypes.string,
         tableClass: PropTypes.string,
+        tableBodyClass: PropTypes.string,
         tableHeaderClass: PropTypes.string,
         buttonAddClass: PropTypes.string,
         buttonDuplicateClass: PropTypes.string,
