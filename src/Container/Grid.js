@@ -19,8 +19,6 @@ const Grid = ({
     if (Array.isArray(elements)) {
         const { values, errors, touched, setFieldValue, initialValues } = formik;
         const arrayValues = _.get(values, containerName);
-        
-        const tableWidth = _.map(elements, 'width').reduce(( sum, num ) => sum + num, 50) || '100%';
         return (
             <div className={ tableContainerClass }>
                 <table className={ tableClass } style={{ width: tableWidth }}>
