@@ -14,7 +14,7 @@ const Grid = ({
         tableContainerClass = 'table-responsive',
         tableBodyClass = '',
         tableClass = 'table table-bordered flutter-editable-grid',
-    }
+    }, formik
 }) => {
     if (Array.isArray(elements)) {
         const { values, errors, touched, setFieldValue, initialValues } = formik;
