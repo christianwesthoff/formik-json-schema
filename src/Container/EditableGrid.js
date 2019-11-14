@@ -86,7 +86,7 @@ const EditableGrid = ({
     const arrayFields = _.mapValues(_.assign({}, elements), () => '');
     const arrayValues = _.get(values, fieldArrayName);
     const hasValue = _.size(arrayValues) > 0;
-    const initialArrayValues = _.head(_.get(values, fieldArrayName.replace(/\d+/, '0')));
+    const initialArrayValues = _.head(_.get(initialValues, fieldArrayName.replace(/\d+/, '0')));
     
     const tableWidth = _.map(elements, 'width').reduce(( sum, num ) => sum + num, 50) || '100%';
     const additionalColumnCount = isSortable ? 2 : !!buttons && (!buttons.add || Object.keys(buttons).length > 1) ? 1 : 0;
@@ -129,7 +129,7 @@ const EditableGrid = ({
                                     { isObject === false && !!buttons && !!buttons.add &&
                                     <td colSpan={ _.size(elements) + additionalColumnCount }>
                                         { _.isFunction(buttons.add)
-                                            ? buttons.add(arrayActions, arrayFields, rowIndex)
+                                            ? buttons.add(arrayActions, arrayFields)
                                             : (
                                                 <button
                                                     type="button"

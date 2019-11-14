@@ -1,13 +1,12 @@
 import _ from 'lodash';
 import Element from '../Element';
-import { getName } from '../utils';
+import { getName, joinNames } from '../utils';
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { joinNames } from '../utils';
 
 const Grid = ({
     config: {
-        name: fieldArrayName,
+        name: containerName = '',
         elements,
         showTableHeader = true,
         tableHeaderClass = '',
@@ -16,9 +15,10 @@ const Grid = ({
         tableClass = 'table table-bordered flutter-editable-grid',
     }, formik
 }) => {
+    const tableWidth = _.map(elements, 'width').reduce(( sum, num ) => sum + num, 50) || '100%';
     if (Array.isArray(elements)) {
         const { values, errors, touched, setFieldValue, initialValues } = formik;
-        const arrayValues = _.get(values, fieldArrayName);
+        const arrayValues = _.get(values, containerName);
         
         const tableWidth = _.map(elements, 'width').reduce(( sum, num ) => sum + num, 50) || '100%';
         return (
@@ -36,7 +36,7 @@ const Grid = ({
                         <tr key={ index }>
                             { _.map(elements, ({ name, label, ...rest }, key) => (
                                 <td key={ key }>
-                                    <Element config={{ ...rest, name: joinNames(fieldArrayName, rowIndex, name) }} />
+                                    <Element config={{ ...rest, name: joinNames(containerName, index, name) }} />
                                 </td>
                             ))}
                         </tr>
@@ -71,7 +71,7 @@ const Grid = ({
             </table>
         </div>
     );
-}
+};
 
 Grid.propTypes = {
     config: PropTypes.shape({
@@ -84,6 +84,6 @@ Grid.propTypes = {
         tableBodyClass: PropTypes.string,
         tableHeaderClass: PropTypes.string,
     })
-}
+};
 
 export default Grid;
