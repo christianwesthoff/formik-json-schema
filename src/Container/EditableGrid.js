@@ -28,7 +28,7 @@ const renderTableRow = ({ fieldArrayName, elements, arrayActions, buttonDuplicat
             <td key={ key }>
                 <Element config={{ ...rest, name: joinNames(fieldArrayName, rowIndex, name) }} />
             </td>
-        ))}
+        )) }
         { isObject === false && !!buttons && (!buttons.add || Object.keys(buttons).length > 1) && (
             <td style={{ minWidth: 50 }}>
                 { !!buttons.remove && (
@@ -83,24 +83,18 @@ const EditableGrid = ({
                           formik
                       }) => {
     const { values, errors, touched, setFieldValue, initialValues } = formik;
+    const initialFieldValues = _.head(_.get(initialValues, fieldArrayName.replace(/\d+/, '0')));
     const arrayFields = _.mapValues(_.assign({}, elements), () => '');
     const arrayValues = _.get(values, fieldArrayName);
     const hasValue = _.size(arrayValues) > 0;
-    const initialArrayValues = _.head(_.get(initialValues, fieldArrayName.replace(/\d+/, '0')));
-    
     const tableWidth = _.map(elements, 'width').reduce(( sum, num ) => sum + num, 50) || '100%';
     const additionalColumnCount = isSortable ? 2 : !!buttons && (!buttons.add || Object.keys(buttons).length > 1) ? 1 : 0;
     return (
         <FieldArray
             name={ fieldArrayName }
             render={( arrayActions ) => {
-                if (!hasValue && initialArrayValues) {
-                    // setInit(true);
-                    arrayActions.push(initialArrayValues);
-                    return null;
-                }
                 const bodyProps = {
-                    arrayValues, hasValue, elements, fieldArrayName, arrayActions, buttons, isSortable, isObject, tableBodyClass, 
+                    arrayValues, hasValue, elements, fieldArrayName, arrayActions, buttons, isSortable, isObject, tableBodyClass,
                     buttonDuplicateClass, buttonRemoveClass, iconSortableHandle
                 };
                 return (
@@ -125,22 +119,24 @@ const EditableGrid = ({
                                 : renderTableBody(bodyProps)
                             }
                             { showTableFooter && <tfoot>
-                                <tr>
-                                    { isObject === false && !!buttons && !!buttons.add &&
-                                    <td colSpan={ _.size(elements) + additionalColumnCount }>
-                                        { _.isFunction(buttons.add)
-                                            ? buttons.add(arrayActions, arrayFields)
-                                            : (
-                                                <button
-                                                    type="button"
-                                                    className={ buttonAddClass }
-                                                    onClick={ arrayActions.push.bind(this, arrayFields) }>{ buttons.add }
-                                                </button>
-                                            )
-                                        }
-                                    </td>
+                            <tr>
+                                { isObject === false && !!buttons && !!buttons.add &&
+                                <td colSpan={ _.size(elements) + additionalColumnCount }>
+                                    { _.isFunction(buttons.add)
+                                        ? buttons.add(arrayActions, 
+                                            initialFieldValues || arrayFields)
+                                        : (
+                                            <button
+                                                type="button"
+                                                className={ buttonAddClass }
+                                                onClick={ arrayActions.push.bind(this, 
+                                                    initialFieldValues || arrayFields) }>{ buttons.add }
+                                            </button>
+                                        )
                                     }
-                                </tr>
+                                </td>
+                                }
+                            </tr>
                             </tfoot> }
                         </table>
                     </div>

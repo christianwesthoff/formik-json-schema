@@ -5,20 +5,20 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 const Grid = ({
-    config: {
-        name: containerName = '',
-        elements,
-        showTableHeader = true,
-        tableHeaderClass = '',
-        tableContainerClass = 'table-responsive',
-        tableBodyClass = '',
-        tableClass = 'table table-bordered flutter-editable-grid',
-    }, formik
-}) => {
+                  config: {
+                      name: containerName = '',
+                      elements,
+                      showTableHeader = true,
+                      tableHeaderClass = '',
+                      tableContainerClass = 'table-responsive',
+                      tableBodyClass = '',
+                      tableClass = 'table table-bordered flutter-editable-grid',
+                  }, formik
+              }) => {
     const tableWidth = _.map(elements, 'width').reduce(( sum, num ) => sum + num, 50) || '100%';
+    const { values } = formik;
     if (Array.isArray(elements)) {
-        const { values, errors, touched, setFieldValue, initialValues } = formik;
-        const arrayValues = _.get(values, containerName);
+        const fieldValues = _.get(values, containerName);
         return (
             <div className={ tableContainerClass }>
                 <table className={ tableClass } style={{ width: tableWidth }}>
@@ -30,18 +30,18 @@ const Grid = ({
                         </tr>
                     </thead> }
                     <tbody className={ tableBodyClass }>
-                    { _.map(arrayValues, ( value, index ) => (
+                    { _.map(fieldValues, ( value, index ) => (
                         <tr key={ index }>
-                            { _.map(elements, ({ name, label, ...rest }, key) => (
+                            { _.map(elements, ({ name, label, labelClass,...rest }, key) => (
                                 <td key={ key }>
                                     <Element config={{ ...rest, name: joinNames(containerName, index, name) }} />
                                 </td>
                             ))}
                         </tr>
-                        ))}
+                    ))}
                     <tr>
                     </tr>
-                </tbody>
+                    </tbody>
                 </table>
             </div>
         );
@@ -57,14 +57,14 @@ const Grid = ({
                     </tr>
                 </thead> }
                 <tbody className={ tableBodyClass }>
-                    <tr>
-                    { _.map(elements, ({ name, ...config }, key) => (
+                <tr>
+                    { _.map(elements, ({ name, label, labelClass, ...config }, key) => (
                         <td><Element
                             key={ key }
                             config={{ ...config, name: getName(config.type, name, containerName) }}
                         /></td>
                     ))}
-                    </tr>
+                </tr>
                 </tbody>
             </table>
         </div>
